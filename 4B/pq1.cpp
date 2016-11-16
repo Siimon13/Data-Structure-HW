@@ -1,0 +1,104 @@
+/*
+  Simon Chen
+  N10013388
+  sc4900
+  Homework 4B
+
+  The purpose of this program is to test our knowledge of runtime and using differet collections and to parse a text file for data
+*/
+
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
+#include <string>
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <sstream>
+#include <cstdlib>
+
+using namespace std;
+
+class trainStopData {
+public:
+
+  trainStopData(const string& stop_id,const string& stop_name, const double stop_lat, const double stop_lon):stop_id(stop_id), stop_name(stop_name), stop_lat(stop_lat), stop_lon(stop_lon) {}
+
+
+  string get_id( ) const { return stop_id;}
+  string get_stop_name( ) const {return stop_name;}
+  double get_latitude( ) const {return stop_lat;}
+  double get_longitude( ) const {return stop_lon;}
+
+private:
+  string stop_id;    // id of train stop (1st token)
+  string stop_name;  // name of station (4th token)
+  double stop_lat;   // latitude of train stop location
+  double stop_lon;   // longitude of train stop location
+};
+
+void parseTrainData(vector<trainStopData>& vecData) { 
+  //insert code here
+  ifstream mtaDataStream("MTA_train_stop_data.txt");
+  
+  if(!mtaDataStream){
+    cerr << "Couldn't open the names file.\n";
+  }
+
+  string line;
+  getline(mtaDataStream,line);
+
+  while(getline(mtaDataStream,line)){
+    stringstream ss;
+    ss.str(line);
+    string element;
+    vector<string> elements;
+
+    while(getline(ss,element,',')){
+      elements.push_back(element);
+    }
+    
+    string stop_id = elements[0];
+    string stop_name = elements[2];
+    double stop_lat = atof(elements[4].c_str());
+    double stop_lon = atof(elements[5].c_str());
+    vecData.push_back(trainStopData(stop_id,stop_name,stop_lat,stop_lon));
+  }
+
+}
+
+SCENARIO("Testing vector<trainStopData>") {
+  GIVEN("A vector with trainStopData") {
+    vector<trainStopData> test;
+    parseTrainData(test);
+    WHEN("Checking the size") {
+      int size = test.size();
+      THEN("The size should be 1482") {
+	REQUIRE(size == 1482); //testing if the vector contains all the data
+      }
+    }
+    WHEN("Getting stop_id") {
+      string id = test[100].get_id(); //test a random data
+      THEN("A valid id should be not nothing") {
+	REQUIRE(id != "");
+      }
+    }
+    WHEN("Getting stop_name") {
+      string name = test[1000].get_stop_name(); //test a random data
+      THEN("A valid name should be not nothing") {
+	REQUIRE(name != "");
+      }
+    }
+    WHEN("Getting latitude") {
+      double lat = test[10].get_latitude(); //test a random data
+      THEN("A valid latitude should be not nothing") {
+	REQUIRE(lat != 0);
+      }
+    }
+    WHEN("Getting longitude") {
+      double lon = test[10].get_longitude(); //test a random data
+      THEN("A valid longitude should be not nothing") {
+	REQUIRE(lon != 0);
+      }
+    }
+  }
+}

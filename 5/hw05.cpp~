@@ -1,0 +1,14 @@
+/*
+  Simon Chen
+  N10013388
+  sc4900
+  Homework 5
+
+  The purpose of this program is to test our knowledge of the linked list class, recursion, parsing files.
+*/
+
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstdlib>

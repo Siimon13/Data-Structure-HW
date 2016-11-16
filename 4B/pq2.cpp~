@@ -1,0 +1,118 @@
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
+#include <vector>
+#include <list>
+#include <set>
+#include <unordered_set>
+#include <string>
+using namespace std;
+
+template <class Object>
+bool dupTestList(const vector<Object>& vec) {
+  // put your code here 
+}
+
+template <class Object>
+bool dupTestSort(const vector<Object>& vec) {
+  // put your code here 
+}
+
+template <class Object>
+bool dupTestSet(const vector<Object>& vec) {
+  // put your code here 
+}
+
+template <class Object>
+bool dupTestUnorderedSet(const vector<Object>& vec) {
+  // put your code here 
+}
+
+SCENARIO("Testing check if there is duplicates") {
+  GIVEN("A vector of int with no duplicates") {
+    vector<int> intvec;
+    intvec.push_back(1);
+    intvec.push_back(2);
+    intvec.push_back(3);
+    WHEN("Checking duplicates with list") {
+      bool isDup = dupTestList(intvec);
+      THEN("It should return false") {
+	REQUIRE(isDup == false); 
+      }
+    }
+    WHEN("Checking duplicates with sort+vec") {
+      bool isDup = dupTestSort(intvec);
+      THEN("It should return false") {
+	REQUIRE(isDup == false);
+      }
+    }
+    WHEN("Checking duplicates with set") {
+      bool isDup = dupTestSet(intvec);
+      THEN("It should return false") {
+	REQUIRE(isDup == false);
+      }
+    }
+    WHEN("Checking duplicates with unordered set") {
+      bool isDup = dupTestUnorderedSet(intvec);
+      THEN("It should return false") {
+	REQUIRE(isDup == false);
+      }
+    }
+  }
+  GIVEN("A vector of char with duplicates") {
+    vector<char> charvec;
+    charvec.push_back('a');
+    charvec.push_back('c');
+    charvec.push_back('a');
+    WHEN("Checking duplicates with list") {
+      bool isDup = dupTestList(charvec);
+      THEN("It should return true") {
+	REQUIRE(isDup == true);
+      }
+    }
+    WHEN("Checking duplicates with sort+vec") {
+      bool isDup = dupTestSort(charvec);
+      THEN("It should return true") {
+	REQUIRE(isDup == true);
+      }
+    }
+    WHEN("Checking duplicates with set") {
+      bool isDup = dupTestSet(charvec);
+      THEN("It should return true") {
+	REQUIRE(isDup == true);
+      }
+    }
+    WHEN("Checking duplicates with unordered set") {
+      bool isDup = dupTestUnorderedSet(charvec);
+      THEN("It should return true") {
+	REQUIRE(isDup == true);
+      }
+    }
+  }
+  GIVEN("An empty vector of string") {
+    vector<string> svec;
+    WHEN("Checking duplicates with list") {
+      bool isDup = dupTestList(svec);
+      THEN("It should return false") {
+	REQUIRE(isDup == false);
+      }
+    }
+    WHEN("Checking duplicates with sort+vec") {
+      bool isDup = dupTestSort(svec);
+      THEN("It should return false") {
+	REQUIRE(isDup == false);
+      }
+    }
+    WHEN("Checking duplicates with set") {
+      bool isDup = dupTestSet(svec);
+      THEN("It should return false") {
+	REQUIRE(isDup == false);
+      }
+    }
+    WHEN("Checking duplicates with unordered set") {
+      bool isDup = dupTestUnorderedSet(svec);
+      THEN("It should return false") {
+	REQUIRE(isDup == false);
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+vector<int> A = {1,2,3,4,5};
+vector<int>::iterator vItr1;
+vector<int>::iterator vItr2;
+list<int> C = {1, 2,3,4,5};
+list<int>::iterator lItr1;
+list<int>::iterator lItr2;
