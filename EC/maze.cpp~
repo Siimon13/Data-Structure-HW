@@ -1,0 +1,24 @@
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+void readMaze(){
+  fstream fs("maze.txt");
+
+}
+
+
+void question1(){
+
+  vector<vector<char> > examplemaze;
+
+}
+
+
+int main(){
+  cout <<"Hello";
+
+}
