@@ -1,0 +1,156 @@
+/*
+Simon Chen
+N10013388
+sc4900
+Homework 10
+
+*/
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+
+template<typename HashedObj>
+class HashTable
+{
+public:
+  enum EntryType { ACTIVE, EMPTY, DELETED };
+private:
+  struct HashEntry {
+    HashedObj element;
+    EntryType info;
+    HashEntry( const HashedObj & e = HashedObj(), EntryType i = EMPTY )
+      : element( e ), info( i ) {}
+  };
+public:
+  typedef typename vector<HashEntry>::const_iterator iterator;
+  explicit HashTable(int size = 101):currentSize(0) {
+    array.resize(size);
+  }
+
+  iterator find( const HashedObj & );
+  bool remove( const HashedObj & );
+  void makeEmpty();
+  bool insert( const HashedObj & );
+  iterator end() const;
+  int capacity() const;
+
+private:
+  std::hash<HashedObj> hf;
+
+  vector<HashEntry> array;
+  int currentSize;
+  void rehash();
+};
+
+template< typename HashedObj >
+bool HashTable<HashedObj>::insert( const HashedObj & x ) {
+
+  int index = hf(x) % array.size();
+  float loadfactor = (currentSize + 0.1)/array.size();
+
+  
+  if (loadfactor >= 0.5)
+    rehash();
+
+
+  for( int i = index; i < array.size(); ++i ) {
+
+    if(array[i].element == x && array[i].info == ACTIVE) break;
+
+    if (array[i].info != ACTIVE){
+      array[i].info = ACTIVE;
+      array[i].element = x;
+      ++currentSize;
+      return true;
+    }
+    
+
+  }
+
+  return false;
+}
+
+template< class HashedObj >
+typename HashTable<HashedObj>::iterator HashTable<HashedObj>::find( const HashedObj & x ) {
+  int index = hf(x) % array.size();
+
+  for( typename vector<HashEntry>::iterator i = array.begin() + index; 
+       i != array.end(); ++i ) {
+      if(i->element == x && i->info == ACTIVE)
+	return i;
+    }
+
+    return array.end();
+  }
+
+  template< typename HashedObj >
+    bool HashTable<HashedObj>::remove( const HashedObj & x ) {
+    int index =  hf(x) % array.size() ;
+    for( int i = index; i < array.size(); ++i ) {
+      if ( array[i].info == EMPTY )
+	return false;
+      if ( array[i].info == ACTIVE && array[i].element == x ) {
+	array[i].info = DELETED;
+	--currentSize;
+	return true;
+      }
+    }
+    for( int i = 0; i < index; ++i ) {
+      if ( array[i].info == EMPTY )
+	return false;
+      if ( array[i].info == ACTIVE && array[i].element == x ) {
+	array[i].info = DELETED;
+	--currentSize;
+	return true;
+      }
+    }
+    /**
+     * There's a clever but convoluted way to merge the above two loops into one
+     * if you would like to give it a shot.
+     */
+    return false;
+  }
+
+  template< typename HashedObj >
+    void HashTable<HashedObj>::rehash() {
+    array.resize(array.size()*2 +1);
+    return;
+  }
+
+  template< typename HashedObj >
+    void HashTable<HashedObj>::makeEmpty() {
+    for( auto i : array )
+      i.info = EMPTY;
+  }
+
+  template<typename HashedObj>
+    typename HashTable<HashedObj>::iterator HashTable<HashedObj>::end() const {
+    return array.end();
+  }
+
+  template<typename HashedObj>
+    int HashTable<HashedObj>::capacity() const {
+    return array.size();
+  }
+
+
+
+  int main(){
+    HashTable<int> hst;
+
+    int capacity = hst.capacity();
+
+    cout << "Capacity: " << capacity << endl;
+
+    for( int i = 0; i < 100; ++i ){
+      // cout << "Inserting: " << i*capacity << endl;
+      hst.insert(i); 
+ 
+    }
+
+    cout << hst.capacity();
+  }
