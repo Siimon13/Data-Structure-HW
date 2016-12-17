@@ -22,33 +22,33 @@ template<typename HashedObj>
 class HashTable
 {
 public:
-  enum EntryType { ACTIVE, EMPTY, DELETED };
+enum EntryType { ACTIVE, EMPTY, DELETED };
 private:
-  struct HashEntry {
-    HashedObj element;
-    EntryType info;
-    HashEntry( const HashedObj & e = HashedObj(), EntryType i = EMPTY )
-      : element( e ), info( i ) {}
+struct HashEntry {
+HashedObj element;
+EntryType info;
+HashEntry( const HashedObj & e = HashedObj(), EntryType i = EMPTY )
+  : element( e ), info( i ) {}
   };
 public:
-  typedef typename vector<HashEntry>::const_iterator iterator;
-  explicit HashTable(int size = 101):currentSize(0) {
-    array.resize(size);
-  }
+typedef typename vector<HashEntry>::const_iterator iterator;
+explicit HashTable(int size = 101):currentSize(0) {
+array.resize(size);
+}
 
-  iterator find( const HashedObj & );
-  bool remove( const HashedObj & );
-  void makeEmpty();
-  bool insert( const HashedObj & );
-  iterator end() const;
-  int capacity() const;
+iterator find( const HashedObj & );
+bool remove( const HashedObj & );
+void makeEmpty();
+bool insert( const HashedObj & );
+iterator end() const;
+int capacity() const;
 
 private:
-  std::hash<HashedObj> hf;
+std::hash<HashedObj> hf;
 
-  vector<HashEntry> array;
-  int currentSize;
-  void rehash();
+vector<HashEntry> array;
+int currentSize;
+void rehash();
 };
 
 template< typename HashedObj >

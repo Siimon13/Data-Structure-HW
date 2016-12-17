@@ -1,0 +1,132 @@
+/*
+  Simon Chen
+  N10013388
+  sc4900
+  Homework 11
+*/
+
+
+#include<iostream>
+#include<vector>
+#include<queue>
+#include <string>
+#include <list>
+#include <unordered_map>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include "shortestpaths.cpp"
+
+using namespace std;
+
+template <class Comparable>
+void print_kth_largest (const vector<Comparable>& a, int k) {
+  //Insert magic here
+  priority_queue<Comparable> q(a.begin(), a.end());
+  // priority_queue<Comparable> q;
+
+  while(k-- > 0){
+    cout << q.top() << endl;
+    q.pop();
+  }
+
+}
+
+
+void getTransferData(unordered_map <string, list<string> >& mtaGraph);
+
+void createMTAGraph(unordered_map <string, list<string> >& mtaGraph){
+  ifstream mtaDataStream("MTA_train_stop_data.txt");
+  
+  if(!mtaDataStream){
+    cerr << "Couldn't open the mta file.\n";
+  }
+ 
+  string line;
+  string prevstop = " ";
+  getline(mtaDataStream,line);
+ 
+  while(getline(mtaDataStream,line)){
+    stringstream ss;
+    ss.str(line);
+    string element;
+    vector<string> elements;
+
+    while(getline(ss,element,',')){
+      elements.push_back(element);
+    }
+    string stop_id = elements[0].substr(0,3); 
+
+    // cout << stop_id << endl;
+    if (mtaGraph.find(stop_id) == mtaGraph.end()){
+      if (prevstop[0] == stop_id[0] && prevstop != stop_id){
+	mtaGraph.insert({stop_id, {prevstop}});
+	mtaGraph[prevstop].push_back(stop_id);
+      }
+      else
+	mtaGraph.insert({stop_id, {}});
+    }
+    prevstop = stop_id;
+  }
+  mtaDataStream.close();
+  getTransferData(mtaGraph);
+}
+
+void getTransferData(unordered_map <string, list<string> >& mtaGraph){
+  ifstream mtaTransferStream("transfers.txt");
+
+  if(!mtaTransferStream){
+    cerr << "Couldn't open the transfer file.\n";
+  }
+
+  string line;
+  getline(mtaTransferStream,line);
+
+  while(getline(mtaTransferStream,line)){
+    stringstream ss;
+    ss.str(line);
+    string element;
+    vector<string> elements;
+
+    while(getline(ss,element,',')){
+      elements.push_back(element);
+    }
+    string from_stop_id = elements[0];
+    string to_stop_id = elements[1];
+
+    // cout << from_stop_id << to_stop_id << endl;
+    if (mtaGraph.find(from_stop_id) == mtaGraph.end()){
+      if (from_stop_id != to_stop_id)
+	mtaGraph.insert({from_stop_id, {to_stop_id}});
+      else
+	mtaGraph.insert({from_stop_id, {}});
+    }
+    else{
+     
+      if (from_stop_id != to_stop_id && 
+	  find(mtaGraph[from_stop_id].begin(), 
+	       mtaGraph[from_stop_id].end(), 
+	       to_stop_id) == mtaGraph[from_stop_id].end())
+	mtaGraph[from_stop_id].push_back(to_stop_id);
+    }
+
+  }
+  mtaTransferStream.close();
+
+}
+
+
+int main(){
+  vector<int> testVec = {5,1,2,4,3};
+  // print_kth_largest(testVec, 2);
+  
+  unordered_map <string, list<string> > mtaGraph;
+  createMTAGraph(mtaGraph);
+  
+  cout << mtaGraph.size() << endl;
+  
+  // for (pair<string, list<string> > x : mtaGraph)
+  //   cout << x.first << endl;
+  shortestMTAGraph( mtaGraph, "111", "112");
+  
+}

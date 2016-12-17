@@ -41,10 +41,15 @@ private:
   bool findEndRec( pair<int,int> curr){
     int curri = curr.first;
     int currj = curr.second;
-
-    if(curri < 0 || curri >= maze.size() ||
-       currj < 0 || currj >= maze[curri].size() ){
+    
+    if(curri < 0 || curri > maze.size() -1  ||
+       currj < 0 || currj > maze[curri].size() - 1 ){
       // cout<< "failed" << endl;
+      maze[curri][currj] = 'x';
+
+      if (!solutionPath.empty())
+	solutionPath.pop();
+
       clearPath();
       return false;
     } 
@@ -52,6 +57,12 @@ private:
     if(maze[curri][currj] == 'e'){
       printMaze();
       restartMaze();
+
+      while(!solutionPath.empty()){
+	cout << solutionPath.top().first << " , " << solutionPath.top().second << endl;
+	solutionPath.pop();
+      }
+
       cout << endl << "Goal found at: " << curri << ' ' << currj << endl;
       return true;
     }
@@ -70,33 +81,38 @@ private:
     // cin.get();
 
     // cout<< "Testing Left" << endl;
+    solutionPath.push(moveLeft);
     if (currj != 0 && maze[curri][currj-1] != '.' && 
 	maze[curri][currj-1] != '-' && findEndRec(moveLeft)){
-      solutionPath.push(moveLeft);
       return true;
     }
 
     // cout<< "Testing Right" << endl;
-    if (currj < maze[curri].size() && maze[curri][currj+1] != '.' && 
+    solutionPath.push(moveRight);
+    if (currj < maze[curri].size() - 1 && maze[curri][currj+1] != '.' && 
 	maze[curri][currj+1] != '-' &&findEndRec( moveRight)){
-      solutionPath.push(moveRight);
       return true;
     }
 
     // cout<< "Testing Up" << endl;
+    solutionPath.push(moveUp);
     if (curri != 0 && maze[curri-1][currj] != '.' && 
 	maze[curri-1][currj] != '-' &&findEndRec( moveUp)){
-      solutionPath.push(moveUp);
       return true;
     }
 
     // cout<< "Testing Down" << endl;
-    if (curri < maze.size() && maze[curri+1][currj] != '.' && 
+    solutionPath.push(moveDown);
+    if (curri < maze.size() - 1 && maze[curri+1][currj] != '.' && 
 	maze[curri + 1][currj] != '-' &&findEndRec( moveDown)){
-      solutionPath.push(moveDown);
       return true;
     }
-  
+
+    if (!solutionPath.empty())
+      solutionPath.pop();
+
+    maze[curri][currj] = 'x';
+
     return false;
   }
 
@@ -195,9 +211,12 @@ public:
       curri = path.first;
       currj = path.second;
 
-      if(curri < 0 || curri >= maze.size() -1 ||
-	 currj < 0 || currj >= maze[curri].size() - 1 ){
+
+      if(curri < 0 || curri > maze.size() - 1 ||
+	 currj < 0 || currj > maze[curri].size() - 1
+	 ){
 	clearPath();
+	cout << "Wall" << endl;
 	continue;
       } 
 
@@ -220,7 +239,7 @@ public:
 
       }
 
-      if (currj < maze[curri].size() && maze[curri][currj+1] != '.' && 
+      if (currj < maze[curri].size() - 1 && maze[curri][currj+1] != '.' && 
 	  maze[curri][currj+1] != '-'){
 	route.push(pair<int,int> (curri,currj+1));
 
@@ -232,7 +251,7 @@ public:
 
       }
     
-      if (curri < maze.size() && maze[curri+1][currj] != '.' && 
+      if (curri < maze.size() -1 && maze[curri+1][currj] != '.' && 
 	  maze[curri + 1][currj] != '-' ){
 	route.push(pair<int,int> (curri+1,currj));
 
@@ -265,54 +284,54 @@ public:
     while(!route.empty()){
 
       pair<int,int> path = route.front();
-      route.pop();
+	route.pop();
     
-      solutionPath.push(path);
+	solutionPath.push(path);
 
-      curri = path.first;
-      currj = path.second;
+	curri = path.first;
+	currj = path.second;
 
-      if(curri < 0 || curri >= maze.size() -1 ||
-	 currj < 0 || currj >= maze[curri].size() - 1 ){
-	clearPath();
-	continue;
-      } 
+	if(curri < 0 || curri > maze.size() -1 ||
+	   currj < 0 || currj > maze[curri].size() - 1 ){
+	  clearPath();
+	  continue;
+	} 
 
-      if(maze[curri][currj] == 'e'){
-	printMaze();
-	cout << endl << "Goal found at: " << curri << ' ' << currj << endl;
-	restartMaze();
-	return;
-      }
+	if(maze[curri][currj] == 'e'){
+	  printMaze();
+	  cout << endl << "Goal found at: " << curri << ' ' << currj << endl;
+	  restartMaze();
+	  return;
+	}
 
-      maze[curri][currj] = '-';
+	maze[curri][currj] = '-';
 
 
-      // printMaze();
-      // cin.get();
+	// printMaze();
+	// cin.get();
 
-      if (currj != 0 && maze[curri][currj-1] != '.' && 
-	  maze[curri][currj-1] != '-'){
-	route.push(pair<int,int> (curri,currj-1));
+	if (currj != 0 && maze[curri][currj-1] != '.' && 
+	    maze[curri][currj-1] != '-'){
+	  route.push(pair<int,int> (curri,currj-1));
 
-      }
+	}
 
-      if (currj < maze[curri].size() && maze[curri][currj+1] != '.' && 
-	  maze[curri][currj+1] != '-'){
-	route.push(pair<int,int> (curri,currj+1));
+	if (currj < maze[curri].size() - 1 && maze[curri][currj+1] != '.' && 
+	    maze[curri][currj+1] != '-'){
+	  route.push(pair<int,int> (curri,currj+1));
 
-      }
-      if (curri != 0 && maze[curri-1][currj] != '.' && 
-	  maze[curri-1][currj] != '-'){
-	route.push(pair<int,int> (curri-1,currj));
+	}
+	if (curri != 0 && maze[curri-1][currj] != '.' && 
+	    maze[curri-1][currj] != '-'){
+	  route.push(pair<int,int> (curri-1,currj));
 
-      }
+	}
     
-      if (curri < maze.size() && maze[curri+1][currj] != '.' && 
-	  maze[curri + 1][currj] != '-' ){
-	route.push(pair<int,int> (curri+1,currj));
+	if (curri < maze.size() - 1 && maze[curri+1][currj] != '.' && 
+	    maze[curri + 1][currj] != '-' ){
+	  route.push(pair<int,int> (curri+1,currj));
 
-      }
+	}
 
     }
 
@@ -332,11 +351,11 @@ void mazeQ(){
   // maze.printPath();
 
   //question 2
-  maze.findEndStack();
+  // maze.findEndStack();
   // maze.printPath();
 
   //question 3
-  maze.findEndQueue();
+  // maze.findEndQueue();
   // maze.printPath();
 
 }

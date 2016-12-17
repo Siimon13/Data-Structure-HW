@@ -1,0 +1,19 @@
+/*
+  Simon Chen
+  N10013388
+  sc4900
+  Homework 11
+*/
+
+
+#include<iostream>
+#include<vector>
+#include<queue>
+#include <string>
+#include <list>
+#include <unordered_map>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+
+using namespace std;

@@ -1,0 +1,216 @@
+/*
+  Simon Chen
+  N10013388
+  sc4900
+  Homework 11
+*/
+
+
+#include<iostream>
+#include<vector>
+#include<queue>
+#include <string>
+#include <list>
+#include <stack>
+#include <unordered_map>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+// #include "shortestpaths.cpp"
+
+using namespace std;
+
+const int DEFAULT_VAL =  -1;      // must be less than 0
+const string DEFAULT_STRVAL =  "";      // must be less an empty string
+
+struct vertexInf                    // Stores information for a vertex
+{                                   
+  int dist;  // distance to vertex from the source
+  string prev;  // previous node in BFS tree
+};
+
+template <class Comparable>
+void print_kth_largest (const vector<Comparable>& a, int k) {
+  //Insert magic here
+  priority_queue<Comparable> q(a.begin(), a.end());
+  // priority_queue<Comparable> q;
+
+  while(k-- > 0){
+    cout << q.top() << endl;
+    q.pop();
+  }
+
+}
+
+class MTA {
+
+public:
+  
+  MTA(){
+    createMTAGraph();
+  }
+
+
+  void getPath(const string& from_stop_id, const string& to_stop_id){
+
+    // int s = 0;
+    // Graph g;
+    queue<string> q;             // q is the queue of vertex numbers
+
+	
+    unordered_map <string, vertexInf > mtaRoute;  // stores BFS info for the vertices
+    // info for vertex j is in position j
+
+  
+    for (pair<string, list<string> > j : mtaGraph)                 // Initialize distances and prev values
+      { mtaRoute[j.first].dist = DEFAULT_VAL; 
+	mtaRoute[j.first].prev = DEFAULT_STRVAL; 
+      }   
+  
+    mtaRoute[from_stop_id].dist = 0;
+	
+    q.push(from_stop_id);
+    string visit_stop;
+    string adj_stop;
+
+    while  (!q.empty() )
+      {
+	visit_stop = q.front();
+	// cout << stop << endl;
+	q.pop();
+
+	cout << visit_stop << endl;
+	// list<string> asd = mtaGraph[stop];
+	list<string>::iterator itr = mtaGraph[visit_stop].begin();
+	list<string>::iterator enditr = mtaGraph[visit_stop].end();
+
+	while(itr != enditr){
+	  adj_stop = *itr++;
+	
+	  if (mtaRoute[adj_stop].dist == DEFAULT_VAL){
+	    mtaRoute[adj_stop].dist = mtaRoute[visit_stop].dist + 1;
+	    mtaRoute[adj_stop].prev = visit_stop;
+	    q.push(adj_stop);
+	  }
+
+	}
+
+      
+	if (visit_stop == to_stop_id) break;
+
+      } 
+
+
+    int distance = mtaRoute[to_stop_id].dist;
+    stack<string> path;
+    string prev_stop = to_stop_id;
+    path.push(to_stop_id);
+  
+    cout << "The Distance is: " <<  distance << endl;
+
+    for (int i = 0; i < distance - 1 ; ++i){
+      prev_stop = mtaRoute[prev_stop].prev;
+      path.push(prev_stop);
+    }
+
+    while(!path.empty()){
+      cout << path.top() << endl;
+      path.pop();
+    }
+
+  }
+
+private:
+  unordered_map <string, list<string> > mtaGraph;
+
+  void getTransferData(){
+    ifstream mtaTransferStream("transfers.txt");
+
+    if(!mtaTransferStream){
+      cerr << "Couldn't open the transfer file.\n";
+    }
+
+    string line;
+    getline(mtaTransferStream,line);
+
+    while(getline(mtaTransferStream,line)){
+      stringstream ss;
+      ss.str(line);
+      string element;
+      vector<string> elements;
+
+      while(getline(ss,element,',')){
+	elements.push_back(element);
+      }
+      string from_stop_id = elements[0];
+      string to_stop_id = elements[1];
+
+      // cout << from_stop_id << to_stop_id << endl;
+      if (mtaGraph.find(from_stop_id) == mtaGraph.end()){
+	if (from_stop_id != to_stop_id)
+	  mtaGraph.insert({from_stop_id, {to_stop_id}});
+	else
+	  mtaGraph.insert({from_stop_id, {}});
+      }
+      else{
+     
+	if (from_stop_id != to_stop_id && 
+	    find(mtaGraph[from_stop_id].begin(), 
+		 mtaGraph[from_stop_id].end(), 
+		 to_stop_id) == mtaGraph[from_stop_id].end())
+	  mtaGraph[from_stop_id].push_back(to_stop_id);
+      }
+
+    }
+
+    mtaTransferStream.close();
+
+  }
+
+  void createMTAGraph(){
+    ifstream mtaDataStream("MTA_train_stop_data.txt");
+  
+    if(!mtaDataStream){
+      cerr << "Couldn't open the mta file.\n";
+    }
+ 
+    string line;
+    string prevstop = " ";
+    getline(mtaDataStream,line);
+ 
+    while(getline(mtaDataStream,line)){
+      stringstream ss;
+      ss.str(line);
+      string element;
+      vector<string> elements;
+
+      while(getline(ss,element,',')){
+	elements.push_back(element);
+      }
+      string stop_id = elements[0].substr(0,3); 
+
+      // cout << stop_id << endl;
+      if (mtaGraph.find(stop_id) == mtaGraph.end()){
+	if (prevstop[0] == stop_id[0] && prevstop != stop_id){
+	  mtaGraph.insert({stop_id, {prevstop}});
+	  mtaGraph[prevstop].push_back(stop_id);
+	}
+	else
+	  mtaGraph.insert({stop_id, {}});
+      }
+      prevstop = stop_id;
+    }
+    mtaDataStream.close();
+    getTransferData();
+  }
+
+
+};
+
+int main(){
+  
+  MTA mta;
+
+  mta.getPath("111", "112");
+
+}
