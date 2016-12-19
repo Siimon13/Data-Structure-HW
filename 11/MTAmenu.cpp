@@ -14,8 +14,11 @@
 #include <stack>
 #include <unordered_map>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <chrono>
+#include <ctime>
 // #include "shortestpaths.cpp"
 
 using namespace std;
@@ -25,8 +28,8 @@ const string DEFAULT_STRVAL =  "";      // must be less an empty string
 
 struct vertexInf                    // Stores information for a vertex
 {                                   
-  int dist;  // distance to vertex from the source
-  string prev;  // previous node in BFS tree
+int dist;  // distance to vertex from the source
+string prev;  // previous node in BFS tree
 };
 
 struct hist 
@@ -160,6 +163,7 @@ private:
 	else
 	  mtaGraph.insert({from_stop_id, {}});
       }
+
       else{
      
 	if (from_stop_id != to_stop_id && 
@@ -222,6 +226,7 @@ void clear(){
 int main(){
   
   MTA mta;
+  string filename;
   string name;
   string input;
   string message;
@@ -231,7 +236,7 @@ int main(){
   hist data;
 
   clear();
-  cout << "Hi! Welcome to Simon's MTA Planner. Serving the CS2314 since December 2016\n \n";
+  cout << "Hi! Welcome to Simon's MTA Planner. Serving CS2314 since December 2016\n \n";
   
   cout << "Can I get your name? \n";
   
@@ -324,7 +329,36 @@ int main(){
     // mta.getPath("111", "112");
     // break;
   }
+
   clear();
+
+  using std::chrono::system_clock;
+  
+  std::chrono::duration<int,std::ratio<60*60*24> > one_day (1);
+
+  system_clock::time_point today = system_clock::now();
+  system_clock::time_point tomorrow = today + one_day;
+
+  std::time_t tt;
+
+  tt = system_clock::to_time_t ( today );
+  std::cout << "today is: " << ctime(&tt);
+
+  filename += name + ".csv";
+  
+  ofstream file;
+  file.open(filename);
+  file << "Savename, Transfers, Route\n";
+
+  for (pair<string, hist> d : localdb){
+    string dname = d.first;
+    hist dhist = d.second;
+
+    file << d.first << "," << dhist.transfer << dhist.route << endl;
+
+  }
+
   cout << "Thank you " << name << "" << endl;
+  cout << "Your data was saved into " << filename << endl;
 
 }
